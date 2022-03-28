@@ -1242,6 +1242,10 @@ class shade(LinkableOperation):
         undersaturation, i.e. poorly visible low-value datapoints, at
         the expense of the overall dynamic range..""")
 
+    rescale_small_values = param.Boolean(default=False, doc="""
+
+        """)
+
 
     @classmethod
     def concatenate(cls, overlay):
@@ -1362,6 +1366,11 @@ class shade(LinkableOperation):
             shade_opts['span'] = self.p.clims
         elif ds_version > LooseVersion('0.5.0') and self.p.cnorm != 'eq_hist':
             shade_opts['span'] = element.range(vdim)
+
+        ###### Need a version check here?????
+        # If how != 'eq_hist' should this issue a warning/error or let datashader do this?
+        if self.p.rescale_small_values and self.p.cnorm == 'eq_hist':
+            shade_opts['rescale_small_values'] = True
 
         params = dict(get_param_values(element), kdims=kdims,
                       bounds=bounds, vdims=RGB.vdims[:],
